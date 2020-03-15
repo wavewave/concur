@@ -85,14 +85,9 @@ awaitViewAction f = do
   view (f n)
   effect $ N.await n
 
--- TODO: what to do when the parent dies?
+{-# DEPRECATED loadWithIO "Just use liftIO instead" #-}
 loadWithIO :: IO a -> Widget v a
-loadWithIO a = do
-  n <- io $ do
-    n <- newEmptyMVar
-    _ <- forkIO $ a >>= putMVar n
-    pure n
-  effect $ takeMVar n
+loadWithIO = effect
 
 -- Make a Widget, which can be pushed to remotely
 remoteWidget :: (MultiAlternative m, MonadUnsafeBlockingIO m, MonadSafeBlockingIO m, MonadIO m, Monad m, Show a) => m b -> (a -> m b) -> IO (a -> m (), m b)
