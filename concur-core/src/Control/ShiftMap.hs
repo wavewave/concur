@@ -14,10 +14,10 @@ class ShiftMap s t where
   shiftMap :: (s ~> s) -> (t ~> t)
 
 instance ShiftMap m m where
-  shiftMap = id
+  shiftMap f = f
 
 instance ShiftMap m (IdentityT m) where
-  shiftMap = mapIdentityT
+  shiftMap f = mapIdentityT f
 
 instance ShiftMap m (StateT s m) where
-  shiftMap = mapStateT
+  shiftMap f = mapStateT f
