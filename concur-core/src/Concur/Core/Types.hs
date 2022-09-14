@@ -34,6 +34,7 @@ import qualified Concur.Core.Notify       as N
 
 data SuspendF v next
   = StepView v next
+  | StepOnlyEvent next
   | forall r. StepBlock (IO r) (r -> next)
   | forall r. StepSTM   (STM r) (r -> next)
   | forall r. StepIO    (IO r) (r -> next)
@@ -121,6 +122,7 @@ instance Monoid v => Alternative (Widget v) where
 
 stepW :: v -> Free (SuspendF v) a -> IO (Either a (v, Maybe (Either (STM (Free (SuspendF v) a)) (IO (Free (SuspendF v) a)))))
 stepW _ (Free (StepView v next))  = stepW v next
+stepW v (Free (StepOnlyEvent next)) = stepW v next
 stepW v (Free (StepIO a next))    = a >>= stepW v . next
 stepW v (Free (StepBlock a next)) = pure $ Right (v, Just $ Right (a >>= pure . next))
 stepW v (Free (StepSTM a next))   = pure $ Right (v, Just $ Left (a >>= pure . next))
